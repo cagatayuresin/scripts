@@ -107,6 +107,10 @@ tablolarına bir satır ekleyin.
 - Çıktılar Türkçe, açıklayıcı ve renklidir; renkler TTY yoksa veya `NO_COLOR` tanımlıysa
   otomatik kapanır.
 - Girinti 2 boşluk, biçimlendirme `shfmt -i 2 -ci` ile uyumlu olmalıdır.
+- **Bir fonksiyonun son komutu döngü olmasın** (ya da döngü gövdesi `kosul && komut`
+  ile bitmesin). `set -Eeuo pipefail` altında koşul yanlış olduğunda döngü `1` döner,
+  fonksiyon `1` döner ve `enable_error_trap` yanıltıcı bir hata basar. Döngü gövdesinde
+  `kosul && komut` yerine `if ... fi` kullanın veya fonksiyonu `return 0` ile bitirin.
 - Hedef ve değişken adları modül önekini taşır (`mp-clean`, `MP_CPUS`); öneksiz ad
   kullanılmaz. Hedefler `MODULE_TARGETS` değişkenine eklenir, aksi halde çakışma
   denetimi o hedefi göremez.

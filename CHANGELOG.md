@@ -5,6 +5,19 @@ sürümler [Semantic Versioning](https://semver.org/lang/tr/) kurallarını izle
 
 ## [Yayınlanmamış]
 
+### Eklendi
+
+- **02-kind-lab** modülü: kind ile ~40 saniyede tek kullanımlık Kubernetes cluster'ı.
+  - `make kind-up` — 1 control-plane + N worker; birlikte yerel imaj deposu
+    (`localhost:5001`) kurulur ve tüm node'ların containerd yapılandırmasına tanıtılır,
+    böylece `kind load docker-image` gerekmez.
+  - `make kind-status`, `make kind-list`, `make kind-reset`, `make kind-down`.
+  - Kurulum öncesi inotify limiti denetimi ve kurulum sonrası çökmüş sistem pod'u
+    kontrolü: kind'in en sık takıldığı `wait-control-plane` / `too many open files`
+    durumu artık sebebiyle birlikte raporlanıyor.
+  - `make kind-down` kubeconfig'deki context/cluster/user girdilerini de temizler;
+    yerel imaj deposu bilinçli olarak korunur (`--purge-registry` ile silinir).
+
 ## [1.0.0] - 2026-08-12
 
 ### Eklendi

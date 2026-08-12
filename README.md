@@ -27,6 +27,7 @@ Scriptler depoda çalıştırılabilir (`755`) tutulur; klonladıktan sonra `chm
 | No | Modül | Ne işe yarar | Ana komutlar | Kılavuz |
 |:--|:--|:--|:--|:--|
 | 01 | `multipass-cluster-maker` | Multipass ile Ubuntu 24.04 test laboratuvarı: 3 makinelik cluster (master + worker + datanode) veya tek makine | `make mp-cluster`, `make mp-singlenode`, `make mp-clean` | [docs](https://cagatayuresin.github.io/scripts/01_multipass-cluster-maker) |
+| 02 | `kind-lab` | kind ile ~40 saniyede tek kullanımlık Kubernetes cluster'ı + yerel imaj deposu (`kind load` gerekmez) | `make kind-up`, `make kind-status`, `make kind-down` | [docs](https://cagatayuresin.github.io/scripts/02_kind-lab) |
 
 ## Örnek
 
