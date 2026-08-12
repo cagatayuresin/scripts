@@ -3,8 +3,15 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: weekly
+      interval: monthly
       day: monday
+    # Tum action guncellemeleri tek PR'da toplanir; aksi halde her action icin
+    # ayri bir PR acilir ve gereksiz gurultu olusur.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+    open-pull-requests-limit: 3
     commit-message:
       prefix: "ci"
     labels:

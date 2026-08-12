@@ -2,7 +2,7 @@ title: scripts
 description: Günlük işleri kolaylaştıran kişisel bash script koleksiyonu
 lang: tr
 
-remote_theme: just-the-docs/just-the-docs@v0.12.2
+remote_theme: just-the-docs/just-the-docs@v0.12.0
 
 url: https://cagatayuresin.github.io
 baseurl: /scripts
