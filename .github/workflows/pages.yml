@@ -13,10 +13,12 @@ permissions:
   pages: write
   id-token: write
 
-# Ayni anda tek yayin; devam eden calisma iptal edilmez.
+# Ayni anda tek yayin. Devam eden calisma iptal EDILIR: takilan bir deployment
+# (ornegin purging_cdn asamasinda asili kalan) yeni yayini bloke etmesin.
+# Her zaman en son commit yayinlandigi icin ara run'larin iptali sorun degildir.
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 jobs:
   build:
