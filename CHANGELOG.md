@@ -7,6 +7,15 @@ sürümler [Semantic Versioning](https://semver.org/lang/tr/) kurallarını izle
 
 ### Eklendi
 
+- **03-dev-disk** modülü: geliştirme makinesinde biriken çöpü ölçer ve temizler.
+  - `make disk-report` — Docker build cache/imaj/volume, journald, APT önbelleği,
+    eski snap sürümleri ve çöp kutusu için kategorili kazanç tablosu (salt okunur).
+  - `make disk-clean` — yalnızca yeniden üretilebilir olanları siler; `DRY=1` ile
+    tek satır silmeden çalıştırılacak komutları listeler.
+  - `make disk-clean-all` — ek olarak kullanılmayan Docker imajları (uyarılı).
+  - Docker volume'ları **hiçbir modda silinmez**, yalnızca raporlanır: durmuş bir
+    veritabanı konteynerinin verisi orada olabilir.
+
 - **02-kind-lab** modülü: kind ile ~40 saniyede tek kullanımlık Kubernetes cluster'ı.
   - `make kind-up` — 1 control-plane + N worker; birlikte yerel imaj deposu
     (`localhost:5001`) kurulur ve tüm node'ların containerd yapılandırmasına tanıtılır,

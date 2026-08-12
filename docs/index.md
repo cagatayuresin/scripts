@@ -28,6 +28,7 @@ ile uğraşmanıza gerek yoktur.
 | 00 | [Kurulum]({{ site.baseurl }}/00_kurulum) | Depoyu klonlama, genel gereksinimler, `make` kullanımı | `make help` |
 | 01 | [multipass-cluster-maker]({{ site.baseurl }}/01_multipass-cluster-maker) | Multipass ile Ubuntu 24.04 test laboratuvarı kurar (3 makinelik cluster veya tek makine) | `make mp-cluster`, `make mp-singlenode`, `make mp-clean` |
 | 02 | [kind-lab]({{ site.baseurl }}/02_kind-lab) | kind ile ~40 saniyede tek kullanımlık Kubernetes cluster'ı + yerel imaj deposu | `make kind-up`, `make kind-status`, `make kind-down` |
+| 03 | [dev-disk]({{ site.baseurl }}/03_dev-disk) | Geliştirme makinesinde biriken çöpü ölçer ve güvenli şekilde temizler (Docker cache, snap, journald) | `make disk-report`, `make disk-clean` |
 
 ## Depo düzeni
 
