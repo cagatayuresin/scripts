@@ -2,7 +2,7 @@
 #
 # preflight.sh - Multipass lab kurulmadan once sistemin hazir olup olmadigini denetler.
 #
-# `make cluster` ve `make singlenode` bu scripti zorunlu on kosul olarak calistirir.
+# `make mp-cluster` ve `make mp-singlenode` bu scripti zorunlu on kosul olarak calistirir.
 # Hicbir sey kurmaz, hicbir seyi degistirmez: sadece okur ve rapor eder.
 #
 # Cikis kodlari:
@@ -153,7 +153,7 @@ check_tools() {
     fi
   else
     check_row fail "Multipass istemcisi" "kurulu" "bulunamadi"
-    check_note "Kurulum icin: make install-deps  (veya: sudo snap install multipass)"
+    check_note "Kurulum icin: make mp-install-deps  (veya: sudo snap install multipass)"
     return 0
   fi
 
@@ -236,7 +236,7 @@ check_cpu() {
     check_note "Cekirdek sayisi asiliyor (overcommit); makineler yavas calisabilir."
   else
     check_row fail "CPU cekirdegi" "${TOTAL_VCPU} vCPU" "${host_cores} cekirdek"
-    check_note "CPUS degerini dusurun: make ${PROFILE} CPUS=1"
+    check_note "CPUS degerini dusurun: make mp-${PROFILE} MP_CPUS=1"
   fi
 }
 
@@ -253,7 +253,7 @@ check_memory() {
     check_note "Toplam RAM yeterli ($(fmt_mib "$total_mib")) ama su an dolu; uygulama kapatmayi dusunun."
   else
     check_row fail "Kullanilabilir bellek" ">= $(fmt_mib "$needed")" "toplam $(fmt_mib "$total_mib")"
-    check_note "MEMORY degerini dusurun: make ${PROFILE} MEMORY=2G"
+    check_note "MEMORY degerini dusurun: make mp-${PROFILE} MP_MEMORY=2G"
   fi
 }
 
@@ -270,7 +270,7 @@ check_disk() {
     check_note "Disk imajlari seyrek (sparse) buyudugu icin baslangicta yetebilir."
   else
     check_row fail "Bos disk alani" ">= $(fmt_mib "$TOTAL_DISK_MIB")" "$(fmt_mib "$avail_mib")"
-    check_note "DISK degerini dusurun: make ${PROFILE} DISK=5G"
+    check_note "DISK degerini dusurun: make mp-${PROFILE} MP_DISK=5G"
   fi
   check_note "Olculen dizin: ${storage}"
 }
@@ -306,8 +306,8 @@ check_name_conflicts() {
     check_row ok "Makine adi cakismasi" "yok" "temiz"
   else
     check_row warn "Makine adi cakismasi" "yok" "${conflicts[*]}"
-    check_note "Mevcut makineler atlanir. Yeniden kurmak icin: make ${PROFILE} RECREATE=1"
-    check_note "Tamamen silmek icin: make clean"
+    check_note "Mevcut makineler atlanir. Yeniden kurmak icin: make mp-${PROFILE} MP_RECREATE=1"
+    check_note "Tamamen silmek icin: make mp-clean"
   fi
 }
 
@@ -331,14 +331,14 @@ print_summary() {
 
   if ((CHECK_FAIL_COUNT > 0)); then
     if ((FORCE == 1)); then
-      printf '\n  %s⚠ FORCE=1 verildi: engelleyici eksiklere ragmen devam ediliyor.%s\n\n' \
+      printf '\n  %s⚠ MP_FORCE=1 verildi: engelleyici eksiklere ragmen devam ediliyor.%s\n\n' \
         "$C_YELLOW$C_BOLD" "$C_RESET"
       return 0
     fi
     printf '\n  %s✖ Sistem hazir degil.%s Yukaridaki %d engeli giderip tekrar deneyin.\n' \
       "$C_RED$C_BOLD" "$C_RESET" "$CHECK_FAIL_COUNT"
-    printf '    Eksik paketleri kurmak icin : %smake install-deps%s\n' "$C_MAGENTA" "$C_RESET"
-    printf '    Yine de denemek icin        : %smake %s FORCE=1%s\n\n' "$C_MAGENTA" "$PROFILE" "$C_RESET"
+    printf '    Eksik paketleri kurmak icin : %smake mp-install-deps%s\n' "$C_MAGENTA" "$C_RESET"
+    printf '    Yine de denemek icin        : %smake mp-%s MP_FORCE=1%s\n\n' "$C_MAGENTA" "$PROFILE" "$C_RESET"
     return 1
   fi
 

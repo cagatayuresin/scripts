@@ -3,8 +3,8 @@
 # vm-up.sh - Multipass ile Ubuntu sanal makineleri olusturur.
 #
 # Iki senaryoda da ayni script calisir:
-#   make cluster    -> --profile cluster    --nodes "master worker datanode"
-#   make singlenode -> --profile singlenode --nodes "singlenode"
+#   make mp-cluster    -> --profile cluster    --nodes "master worker datanode"
+#   make mp-singlenode -> --profile singlenode --nodes "singlenode"
 #
 # Her makine ayni sablondan (cloud-init/node.yaml) uretilir: parola ile SSH
 # girisi acik, sudo yetkili bir kullanici hazir gelir.
@@ -138,7 +138,7 @@ done
 read -r -a NODE_LIST <<<"$NODES"
 ((${#NODE_LIST[@]} > 0)) || die "En az bir makine adi gerekli (--nodes)"
 [[ -f $TEMPLATE ]] || die "cloud-init sablonu bulunamadi: $TEMPLATE"
-require_cmd multipass "Kurulum icin: make install-deps"
+require_cmd multipass "Kurulum icin: make mp-install-deps"
 
 # --- Yardimcilar -----------------------------------------------------------
 
@@ -224,12 +224,12 @@ handle_existing() {
       log_warn "'${node}' zaten var, atlaniyor (durum: $(vm_state "$node"))"
       SKIPPED_NODES+=("$node")
     done
-    log_dim "Yeniden kurmak icin: make ${PROFILE} RECREATE=1"
-    log_dim "Tamamen silmek icin : make clean"
+    log_dim "Yeniden kurmak icin: make mp-${PROFILE} MP_RECREATE=1"
+    log_dim "Tamamen silmek icin : make mp-clean"
     return 0
   fi
 
-  log_step "Mevcut makineler siliniyor (RECREATE=1)"
+  log_step "Mevcut makineler siliniyor (MP_RECREATE=1)"
   log_warn "Silinecek: ${existing[*]}"
   if ! confirm "Bu makineler kalici olarak silinecek, devam edilsin mi?"; then
     die "Kullanici iptal etti."
@@ -371,8 +371,8 @@ print_summary() {
   printf '\n  %sSik kullanilan komutlar%s\n' "$C_BOLD" "$C_RESET"
   log_cmd "ssh ${VM_USER}@$(vm_ip "${NODE_LIST[0]}")"
   log_cmd "multipass shell ${NODE_LIST[0]}"
-  log_cmd "make status"
-  log_cmd "make clean"
+  log_cmd "make mp-status"
+  log_cmd "make mp-clean"
 
   if ((${#SKIPPED_NODES[@]} > 0)); then
     printf '\n'

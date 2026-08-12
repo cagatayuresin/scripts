@@ -20,7 +20,7 @@ ilgili kılavuz sayfasında ayrıca listelenir.
 | `git` | Depoyu klonlamak için | `sudo apt install git` |
 | `awk`, `sed`, `grep` | Çıktı ayrıştırma | Dağıtımla birlikte gelir |
 
-Modüle özel araçlar (örneğin Multipass) ilgili modülün `make install-deps` hedefiyle kurulur.
+Modüle özel araçlar (örneğin Multipass) ilgili modülün `make mp-install-deps` hedefiyle kurulur.
 
 ## Depoyu klonlama
 
@@ -30,20 +30,22 @@ cd scripts
 make help
 ```
 
-`make help` çıktısı, depodaki tüm modülleri ve hedefleri gruplanmış olarak listeler:
+`make help` çıktısı, depodaki tüm modülleri ve hedefleri gruplanmış olarak listeler.
+Her modülün hedefleri kendi önekini taşır (01. modül için `mp-`), böylece ileride
+eklenecek modüller aynı adı kullansa bile çakışma olmaz:
 
 ```text
 cagatayuresin/scripts - kisisel bash script koleksiyonu
 Kullanim: make <hedef> [DEGISKEN=deger]
 
   01-multipass-cluster-maker (Multipass ile Ubuntu VM lab)
-    preflight         Sistem gereksinimlerini denetler (cluster/singlenode oncesi zorunlu)
-    install-deps      Eksik bagimliliklari kurar (multipass vb., sudo ister)
-    cluster           3 makinelik cluster kurar (master + worker + datanode)
-    singlenode        Tek makine kurar (singlenode)
-    status            Kurulu makinelerin durumunu ve kaynaklarini gosterir
-    ssh-info          Makinelere SSH ile baglanma bilgilerini yazdirir
-    clean             Bu modulun olusturdugu tum makineleri kalici olarak siler
+    mp-preflight      Sistem gereksinimlerini denetler (kurulumdan once zorunlu calisir)
+    mp-install-deps   Eksik bagimliliklari kurar (multipass vb., sudo ister)
+    mp-cluster        3 makinelik cluster kurar (master + worker + datanode)
+    mp-singlenode     Tek makine kurar (singlenode)
+    mp-status         Kurulu makinelerin durumunu ve kaynaklarini gosterir
+    mp-ssh-info       Makinelere SSH ile baglanma bilgilerini yazdirir
+    mp-clean          Bu modulun olusturdugu tum makineleri kalici olarak siler
 
   Genel
     help              Bu yardim ekranini gosterir
@@ -76,8 +78,8 @@ Modül hedefleri değişkenlerle özelleştirilebilir; komut satırında verilen
 varsayılanı ezer:
 
 ```bash
-make cluster CPUS=4 MEMORY=8G DISK=20G
-make singlenode RELEASE=22.04
+make mp-cluster MP_CPUS=4 MP_MEMORY=8G MP_DISK=20G
+make mp-singlenode MP_RELEASE=22.04
 ```
 
 ## Renkli çıktı
@@ -86,7 +88,7 @@ make singlenode RELEASE=22.04
 Renkleri tamamen kapatmak için standart `NO_COLOR` değişkeni kullanılabilir:
 
 ```bash
-NO_COLOR=1 make preflight
+NO_COLOR=1 make mp-preflight
 ```
 
 Scriptler doğrudan çağrıldığında `--no-color` seçeneğini de kabul eder.
@@ -101,4 +103,4 @@ Tüm modül scriptleri aynı arayüzü paylaşır:
 | `--yes` | Onay sorularını atlar (otomasyon için) |
 | `--no-color` | Renkli çıktıyı kapatır |
 
-Make tarafında ise `YES=1` onayları, `FORCE=1` preflight engellerini atlar.
+Make tarafında ise `YES=1` onayları, `MP_FORCE=1` preflight engellerini atlar.

@@ -26,15 +26,15 @@ Scriptler depoda çalıştırılabilir (`755`) tutulur; klonladıktan sonra `chm
 
 | No | Modül | Ne işe yarar | Ana komutlar | Kılavuz |
 |:--|:--|:--|:--|:--|
-| 01 | `multipass-cluster-maker` | Multipass ile Ubuntu 24.04 test laboratuvarı: 3 makinelik cluster (master + worker + datanode) veya tek makine | `make cluster`, `make singlenode`, `make clean` | [docs](https://cagatayuresin.github.io/scripts/01_multipass-cluster-maker) |
+| 01 | `multipass-cluster-maker` | Multipass ile Ubuntu 24.04 test laboratuvarı: 3 makinelik cluster (master + worker + datanode) veya tek makine | `make mp-cluster`, `make mp-singlenode`, `make mp-clean` | [docs](https://cagatayuresin.github.io/scripts/01_multipass-cluster-maker) |
 
 ## Örnek
 
 ```bash
-make preflight     # sistemde eksik var mı? (hiçbir şey kurmaz)
-make cluster       # 2 vCPU / 4 GB RAM / 10 GB diskli 3 Ubuntu 24.04 makinesi
-make ssh-info      # ssh cluster@<ip>  (parola: cluster)
-make clean         # makineleri hiç var olmamış gibi siler
+make mp-preflight     # sistemde eksik var mı? (hiçbir şey kurmaz)
+make mp-cluster       # 2 vCPU / 4 GB RAM / 10 GB diskli 3 Ubuntu 24.04 makinesi
+make mp-ssh-info      # ssh cluster@<ip>  (parola: cluster)
+make mp-clean         # makineleri hiç var olmamış gibi siler
 ```
 
 ```text
@@ -78,6 +78,8 @@ Kural basit: `scripts/NN-modul-adi/` klasörünün kılavuzu `docs/NN_modul-adi.
 2. Scriptleri yaz; ortak log/renk/tablo yardımcıları için `lib/common.sh` dosyasını `source` et.
 3. `module.mk` içinde hedeflerini tanımla ve `##` yorumlarıyla belgele — `make help`
    bunları kendiliğinden listeler, kök `Makefile`'a dokunmak gerekmez.
+   **Tüm hedefler ve değişkenler modül önekini taşır** (01. modül `mp-` / `MP_`), böylece
+   iki modül aynı adı kullanamaz; kök Makefile çakışmayı yakalayıp derlemeyi durdurur.
 4. `docs/NN_modul-adi.md` kılavuzunu yaz, rozetlerini ekle.
 5. `make fix-perms && make lint`
 
@@ -87,7 +89,7 @@ Ayrıntılar: [CONTRIBUTING.md](CONTRIBUTING.md)
 
 - Linux (Ubuntu/Debian üzerinde test edilir)
 - `bash` 4.4+, `make`, `awk`, `sed`, `grep`
-- Modüle özel araçlar ilgili modülün `make install-deps` hedefiyle kurulur
+- Modüle özel araçlar ilgili modülün `make mp-install-deps` hedefiyle kurulur
 
 ## Dokümantasyonu yayınlama (tek seferlik ayar)
 

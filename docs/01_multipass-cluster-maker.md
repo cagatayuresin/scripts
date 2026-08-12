@@ -18,8 +18,8 @@ kullanıcıyla hazır gelir — yani gerçek bir sunucu gibi davranırlar.
 
 | Komut | Sonuç |
 |:--|:--|
-| `make cluster` | 3 makine: **master**, **worker**, **datanode** |
-| `make singlenode` | 1 makine: **singlenode** |
+| `make mp-cluster` | 3 makine: **master**, **worker**, **datanode** |
+| `make mp-singlenode` | 1 makine: **singlenode** |
 
 Her makinenin varsayılan profili: **2 vCPU · 4 GB RAM · 10 GB disk**.
 
@@ -27,25 +27,25 @@ Her makinenin varsayılan profili: **2 vCPU · 4 GB RAM · 10 GB disk**.
 
 | Gereksinim | Not |
 |:--|:--|
-| Multipass 1.10+ | `make install-deps` ile kurulabilir (`sudo snap install multipass`) |
+| Multipass 1.10+ | `make mp-install-deps` ile kurulabilir (`sudo snap install multipass`) |
 | KVM desteği | `/dev/kvm` erişilebilir olmalı; BIOS/UEFI'de VT-x veya AMD-V açık olmalı |
 | Boş kaynak | Cluster için ~6 vCPU, ~13 GB kullanılabilir RAM, ~33 GB disk |
 | `sshpass` (opsiyonel) | Kurulum sonunda parola ile SSH girişi otomatik test edilir |
 
-Bu gereksinimlerin tümü `make preflight` ile denetlenir ve `make cluster` / `make singlenode`
+Bu gereksinimlerin tümü `make mp-preflight` ile denetlenir ve `make mp-cluster` / `make mp-singlenode`
 komutları preflight'ı **kendiliğinden, zorunlu olarak** çalıştırır — atlanamaz.
 
 ## Make hedefleri
 
 | Hedef | Açıklama |
 |:--|:--|
-| `make preflight` | Sistemi denetler, hiçbir şey kurmaz ve değiştirmez |
-| `make install-deps` | Eksik araçları kurar (sudo ister, onay alır) |
-| `make cluster` | preflight → 3 makine kurar |
-| `make singlenode` | preflight → 1 makine kurar |
-| `make status` | Kurulu makinelerin durumu, IP'si ve kaynak kullanımı |
-| `make ssh-info` | Kopyalanabilir SSH bağlantı komutları |
-| `make clean` | Makineleri kalıcı olarak siler, izlerini temizler |
+| `make mp-preflight` | Sistemi denetler, hiçbir şey kurmaz ve değiştirmez |
+| `make mp-install-deps` | Eksik araçları kurar (sudo ister, onay alır) |
+| `make mp-cluster` | preflight → 3 makine kurar |
+| `make mp-singlenode` | preflight → 1 makine kurar |
+| `make mp-status` | Kurulu makinelerin durumu, IP'si ve kaynak kullanımı |
+| `make mp-ssh-info` | Kopyalanabilir SSH bağlantı komutları |
+| `make mp-clean` | Makineleri kalıcı olarak siler, izlerini temizler |
 
 ## Parametreler
 
@@ -53,25 +53,25 @@ Tüm değişkenler komut satırından ezilebilir:
 
 | Değişken | Varsayılan | Anlamı |
 |:--|:--|:--|
-| `CPUS` | `2` | Makine başına vCPU |
-| `MEMORY` | `4G` | Makine başına RAM |
-| `DISK` | `10G` | Makine başına disk |
-| `RELEASE` | `24.04` | Ubuntu sürümü (`22.04`, `noble` vb.) |
-| `VM_USER` | `cluster` | Oluşturulacak kullanıcı |
-| `VM_PASS` | `cluster` | Kullanıcının parolası |
-| `CLUSTER_NODES` | `master worker datanode` | Cluster makine adları |
-| `SINGLE_NODE` | `singlenode` | Tek makine senaryosunun adı |
-| `FORCE` | — | `FORCE=1`: preflight engellerine rağmen devam et |
-| `RECREATE` | — | `RECREATE=1`: aynı adlı makineleri silip yeniden kur |
+| `MP_CPUS` | `2` | Makine başına vCPU |
+| `MP_MEMORY` | `4G` | Makine başına RAM |
+| `MP_DISK` | `10G` | Makine başına disk |
+| `MP_RELEASE` | `24.04` | Ubuntu sürümü (`22.04`, `noble` vb.) |
+| `MP_USER` | `cluster` | Oluşturulacak kullanıcı |
+| `MP_PASS` | `cluster` | Kullanıcının parolası |
+| `MP_CLUSTER_NODES` | `master worker datanode` | Cluster makine adları |
+| `MP_SINGLE_NODE` | `singlenode` | Tek makine senaryosunun adı |
+| `MP_FORCE` | — | `MP_FORCE=1`: preflight engellerine rağmen devam et |
+| `MP_RECREATE` | — | `MP_RECREATE=1`: aynı adlı makineleri silip yeniden kur |
 | `YES` | — | `YES=1`: onay sorularını atla |
 
 Örnekler:
 
 ```bash
-make cluster CPUS=4 MEMORY=8G DISK=20G     # daha güçlü makineler
-make singlenode RELEASE=22.04              # farklı Ubuntu sürümü
-make cluster CLUSTER_NODES="db app lb"     # kendi makine adların
-make cluster RECREATE=1 YES=1              # var olanları silip baştan kur
+make mp-cluster MP_CPUS=4 MP_MEMORY=8G MP_DISK=20G     # daha güçlü makineler
+make mp-singlenode MP_RELEASE=22.04              # farklı Ubuntu sürümü
+make mp-cluster MP_CLUSTER_NODES="db app lb"     # kendi makine adların
+make mp-cluster MP_RECREATE=1 YES=1              # var olanları silip baştan kur
 ```
 
 ## Çalıştırma
@@ -79,7 +79,7 @@ make cluster RECREATE=1 YES=1              # var olanları silip baştan kur
 ### 1. Sistemi denetle
 
 ```bash
-make preflight
+make mp-preflight
 ```
 
 ```text
@@ -115,12 +115,12 @@ Kontroller üç seviyede raporlanır:
 - **`[ UYARI ]`** — kurulum yapılabilir ama dikkat edilmeli (örneğin RAM sıkışık,
   aynı adda makine zaten var). Kurulum devam eder.
 - **`[ HATA ]`** — kurulum engellenir (örneğin Multipass kurulu değil, KVM yok).
-  Çıkış kodu `1` olur ve `make cluster` durur. Yine de denemek için `FORCE=1`.
+  Çıkış kodu `1` olur ve `make mp-cluster` durur. Yine de denemek için `MP_FORCE=1`.
 
 ### 2. Kur
 
 ```bash
-make cluster
+make mp-cluster
 ```
 
 ```text
@@ -153,7 +153,7 @@ make cluster
 ### 3. Bağlan
 
 ```bash
-make ssh-info          # bağlantı bilgilerini göster
+make mp-ssh-info          # bağlantı bilgilerini göster
 ssh cluster@10.126.184.10
 # parola: cluster
 ```
@@ -167,7 +167,7 @@ multipass shell master
 ### 4. Sil
 
 ```bash
-make clean
+make mp-clean
 ```
 
 Makineler `--purge` ile silinir, `multipass purge` çalıştırılır ve makinelerin IP
@@ -196,10 +196,10 @@ ssh cluster@<master-ip> 'ping -c1 worker && ping -c1 datanode'
 
 | Belirti | Sebep / Çözüm |
 |:--|:--|
-| `[ HATA ] Multipass istemcisi` | `make install-deps` veya `sudo snap install multipass` |
+| `[ HATA ] Multipass istemcisi` | `make mp-install-deps` veya `sudo snap install multipass` |
 | `[ HATA ] Multipass servisi` | `sudo snap start multipass`, durum: `snap services multipass` |
 | `[ HATA ] KVM cihazi` | BIOS/UEFI'de sanallaştırmayı açın; `sudo usermod -aG kvm $USER` |
-| `[ UYARI ] Makine adi cakismasi` | Makine zaten var; `make cluster RECREATE=1` veya `make clean` |
+| `[ UYARI ] Makine adi cakismasi` | Makine zaten var; `make mp-cluster MP_RECREATE=1` veya `make mp-clean` |
 | `launch failed: timed out` | İmaj indirmesi yavaş olabilir; komutu tekrar çalıştırın |
 | `cloud-init 'done' durumuna ulasamadi` | `multipass exec <ad> -- sudo cloud-init status --long` ile inceleyin |
 | SSH parola sormadan reddediyor | `multipass exec <ad> -- sudo sshd -T \| grep passwordauth` ile kontrol edin |
@@ -208,7 +208,7 @@ ssh cluster@<master-ip> 'ping -c1 worker && ping -c1 datanode'
 
 - Makineler **NAT** arkasındaki Multipass ağındadır; IP'ler yeniden kurulumda değişebilir.
   Bu yüzden scriptler IP'yi her seferinde `multipass list` üzerinden okur.
-- `make clean` yalnızca bu modülün adlarını (`master`, `worker`, `datanode`, `singlenode`)
+- `make mp-clean` yalnızca bu modülün adlarını (`master`, `worker`, `datanode`, `singlenode`)
   hedefler; başka Multipass makineleriniz varsa onlara dokunmaz. Her şeyi silmek için
   `scripts/01-multipass-cluster-maker/vm-clean.sh --all` kullanılabilir.
 - Parola ile SSH girişi bilinçli bir tercihtir: bu bir **yerel test laboratuvarıdır**.

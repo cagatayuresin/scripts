@@ -26,7 +26,7 @@ ile uğraşmanıza gerek yoktur.
 | No | Modül | Ne işe yarar | Ana komutlar |
 |:--|:--|:--|:--|
 | 00 | [Kurulum]({{ site.baseurl }}/00_kurulum) | Depoyu klonlama, genel gereksinimler, `make` kullanımı | `make help` |
-| 01 | [multipass-cluster-maker]({{ site.baseurl }}/01_multipass-cluster-maker) | Multipass ile Ubuntu 24.04 test laboratuvarı kurar (3 makinelik cluster veya tek makine) | `make cluster`, `make singlenode`, `make clean` |
+| 01 | [multipass-cluster-maker]({{ site.baseurl }}/01_multipass-cluster-maker) | Multipass ile Ubuntu 24.04 test laboratuvarı kurar (3 makinelik cluster veya tek makine) | `make mp-cluster`, `make mp-singlenode`, `make mp-clean` |
 
 ## Depo düzeni
 

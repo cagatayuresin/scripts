@@ -1,71 +1,80 @@
 # 01-multipass-cluster-maker - make hedefleri
 #
-# Kok Makefile bu dosyayi otomatik include eder. Buradaki tum degiskenler
-# komut satirindan ezilebilir:
-#   make cluster CPUS=4 MEMORY=8G DISK=20G
-#   make singlenode RELEASE=22.04
+# Kok Makefile bu dosyayi otomatik include eder.
+#
+# Isimlendirme kurali: bu modulun TUM hedefleri ve degiskenleri 'mp-' / 'MP_'
+# onekini tasir. Boylece 02, 03 ... modulleri ayni adi (clean, status, CPUS gibi)
+# kullansa bile catisma olmaz. Kok Makefile ayni hedefi iki modul tanimlarsa
+# derlemeyi hata ile durdurur.
+#
+# Ornekler:
+#   make mp-cluster MP_CPUS=4 MP_MEMORY=8G MP_DISK=20G
+#   make mp-singlenode MP_RELEASE=22.04
 
 ##@ 01-multipass-cluster-maker (Multipass ile Ubuntu VM lab)
 
-MPCM_DIR := $(REPO_ROOT)/scripts/01-multipass-cluster-maker
+MP_DIR := $(REPO_ROOT)/scripts/01-multipass-cluster-maker
 
 # --- Ayarlanabilir degiskenler ---------------------------------------------
-RELEASE       ?= 24.04
-CPUS          ?= 2
-MEMORY        ?= 4G
-DISK          ?= 10G
-VM_USER       ?= cluster
-VM_PASS       ?= cluster
-CLUSTER_NODES ?= master worker datanode
-SINGLE_NODE   ?= singlenode
+MP_RELEASE       ?= 24.04
+MP_CPUS          ?= 2
+MP_MEMORY        ?= 4G
+MP_DISK          ?= 10G
+MP_USER          ?= cluster
+MP_PASS          ?= cluster
+MP_CLUSTER_NODES ?= master worker datanode
+MP_SINGLE_NODE   ?= singlenode
 
-# Modulun yonettigi tum makine adlari (clean bu kumeyi hedefler)
-MANAGED_NODES ?= $(CLUSTER_NODES) $(SINGLE_NODE)
+# Modulun yonettigi tum makine adlari (mp-clean bu kumeyi hedefler)
+MP_MANAGED_NODES ?= $(MP_CLUSTER_NODES) $(MP_SINGLE_NODE)
 
-# preflight profili; cluster/singlenode hedefleri kendi degeriyle cagirir
-PROFILE ?= cluster
+# preflight profili; mp-cluster/mp-singlenode kendi degeriyle cagirir
+MP_PROFILE ?= cluster
 
-# FORCE=1     -> preflight uyarilarini yok say (hatalari degil)
-# RECREATE=1  -> var olan makineleri silip yeniden kur
-# YES=1       -> onay sorularini atla
-MPCM_FORCE    := $(if $(filter 1 yes true,$(FORCE)),--force,)
-MPCM_RECREATE := $(if $(filter 1 yes true,$(RECREATE)),--force,)
-MPCM_YES      := $(if $(filter 1 yes true,$(YES)),--yes,)
+# MP_FORCE=1     -> preflight engellerine ragmen devam et
+# MP_RECREATE=1  -> var olan makineleri silip yeniden kur
+# YES=1          -> onay sorularini atla (depo geneli bayrak, kok Makefile'da)
+MP_FORCE_FLAG    := $(if $(filter 1 yes true,$(MP_FORCE)),--force,)
+MP_RECREATE_FLAG := $(if $(filter 1 yes true,$(MP_RECREATE)),--force,)
 
-MPCM_VM_ARGS := --cpus '$(CPUS)' --memory '$(MEMORY)' --disk '$(DISK)' \
-                --release '$(RELEASE)' --user '$(VM_USER)' --pass '$(VM_PASS)'
+MP_VM_ARGS := --cpus '$(MP_CPUS)' --memory '$(MP_MEMORY)' --disk '$(MP_DISK)' \
+              --release '$(MP_RELEASE)' --user '$(MP_USER)' --pass '$(MP_PASS)'
 
-.PHONY: preflight
-preflight: ## Sistem gereksinimlerini denetler (cluster/singlenode oncesi zorunlu)
-	@$(MPCM_DIR)/preflight.sh --profile '$(PROFILE)' \
-		--nodes '$(if $(filter singlenode,$(PROFILE)),$(SINGLE_NODE),$(CLUSTER_NODES))' \
-		$(MPCM_VM_ARGS) $(MPCM_FORCE)
+# Catisma denetimi icin hedefleri kok Makefile'a bildir.
+MODULE_TARGETS += mp-preflight mp-install-deps mp-cluster mp-singlenode \
+                  mp-status mp-ssh-info mp-clean
 
-.PHONY: install-deps
-install-deps: ## Eksik bagimliliklari kurar (multipass vb., sudo ister)
-	@$(MPCM_DIR)/install-deps.sh $(MPCM_YES)
+.PHONY: mp-preflight
+mp-preflight: ## Sistem gereksinimlerini denetler (kurulumdan once zorunlu calisir)
+	@$(MP_DIR)/preflight.sh --profile '$(MP_PROFILE)' \
+		--nodes '$(if $(filter singlenode,$(MP_PROFILE)),$(MP_SINGLE_NODE),$(MP_CLUSTER_NODES))' \
+		$(MP_VM_ARGS) $(MP_FORCE_FLAG)
 
-.PHONY: cluster
-cluster: PROFILE := cluster
-cluster: preflight ## 3 makinelik cluster kurar (master + worker + datanode)
-	@$(MPCM_DIR)/vm-up.sh --profile cluster --nodes '$(CLUSTER_NODES)' \
-		$(MPCM_VM_ARGS) $(MPCM_RECREATE) $(MPCM_YES)
+.PHONY: mp-install-deps
+mp-install-deps: ## Eksik bagimliliklari kurar (multipass vb., sudo ister)
+	@$(MP_DIR)/install-deps.sh $(YES_FLAG)
 
-.PHONY: singlenode
-singlenode: PROFILE := singlenode
-singlenode: preflight ## Tek makine kurar (singlenode)
-	@$(MPCM_DIR)/vm-up.sh --profile singlenode --nodes '$(SINGLE_NODE)' \
-		$(MPCM_VM_ARGS) $(MPCM_RECREATE) $(MPCM_YES)
+.PHONY: mp-cluster
+mp-cluster: MP_PROFILE := cluster
+mp-cluster: mp-preflight ## 3 makinelik cluster kurar (master + worker + datanode)
+	@$(MP_DIR)/vm-up.sh --profile cluster --nodes '$(MP_CLUSTER_NODES)' \
+		$(MP_VM_ARGS) $(MP_RECREATE_FLAG) $(YES_FLAG)
 
-.PHONY: status
-status: ## Kurulu makinelerin durumunu ve kaynaklarini gosterir
-	@$(MPCM_DIR)/vm-info.sh --mode status --nodes '$(MANAGED_NODES)' --user '$(VM_USER)'
+.PHONY: mp-singlenode
+mp-singlenode: MP_PROFILE := singlenode
+mp-singlenode: mp-preflight ## Tek makine kurar (singlenode)
+	@$(MP_DIR)/vm-up.sh --profile singlenode --nodes '$(MP_SINGLE_NODE)' \
+		$(MP_VM_ARGS) $(MP_RECREATE_FLAG) $(YES_FLAG)
 
-.PHONY: ssh-info
-ssh-info: ## Makinelere SSH ile baglanma bilgilerini yazdirir
-	@$(MPCM_DIR)/vm-info.sh --mode ssh --nodes '$(MANAGED_NODES)' \
-		--user '$(VM_USER)' --pass '$(VM_PASS)'
+.PHONY: mp-status
+mp-status: ## Kurulu makinelerin durumunu ve kaynaklarini gosterir
+	@$(MP_DIR)/vm-info.sh --mode status --nodes '$(MP_MANAGED_NODES)' --user '$(MP_USER)'
 
-.PHONY: clean
-clean: ## Bu modulun olusturdugu tum makineleri kalici olarak siler
-	@$(MPCM_DIR)/vm-clean.sh --nodes '$(MANAGED_NODES)' $(MPCM_YES)
+.PHONY: mp-ssh-info
+mp-ssh-info: ## Makinelere SSH ile baglanma bilgilerini yazdirir
+	@$(MP_DIR)/vm-info.sh --mode ssh --nodes '$(MP_MANAGED_NODES)' \
+		--user '$(MP_USER)' --pass '$(MP_PASS)'
+
+.PHONY: mp-clean
+mp-clean: ## Bu modulun olusturdugu tum makineleri kalici olarak siler
+	@$(MP_DIR)/vm-clean.sh --nodes '$(MP_MANAGED_NODES)' $(YES_FLAG)

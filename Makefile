@@ -36,8 +36,34 @@ endif
 MODULE_DIRS := $(sort $(wildcard $(REPO_ROOT)/scripts/*/))
 SH_FILES    := $(shell find $(REPO_ROOT)/scripts $(REPO_ROOT)/lib -name '*.sh' 2>/dev/null)
 
+# Depo geneli bayraklar. Anlamlari her modulde ayni oldugu icin bunlar
+# namespace'siz kalir; module ozel olan her sey 'mp-' gibi bir onek tasir.
+# YES=1 -> onay sorularini atla
+YES_FLAG := $(if $(filter 1 yes true,$(YES)),--yes,)
+
+# Kok Makefile'a ait, modullerin kullanamayacagi hedef adlari.
+RESERVED_TARGETS := help modules lint fmt fix-perms check-perms
+
+# Moduller hedeflerini MODULE_TARGETS degiskenine ekler; asagidaki denetim
+# ayni adin iki modulde kullanilmasini yakalar.
+MODULE_TARGETS :=
+
 # --- Modul hedefleri -------------------------------------------------------
 include $(wildcard $(REPO_ROOT)/scripts/*/module.mk)
+
+# --- Catisma denetimi ------------------------------------------------------
+# make ayni hedefi iki kez gorurse yalnizca "warning: overriding recipe" basip
+# SON tanimi calistirir; ciktinin basinda kaybolan bu uyari, yanlis modulun
+# silme islemini calistirmasina yol acabilir. Bu yuzden hata ile duruyoruz.
+DUPLICATE_TARGETS := $(strip $(shell printf '%s\n' $(MODULE_TARGETS) | sort | uniq -d))
+ifneq ($(DUPLICATE_TARGETS),)
+  $(error Hedef adi catismasi: $(DUPLICATE_TARGETS). Her modul hedeflerini kendi onekiyle adlandirmali (01 modulu mp-, 02 modulu ornegin yedek-). Bkz. CONTRIBUTING.md)
+endif
+
+CLASHING_RESERVED := $(strip $(filter $(RESERVED_TARGETS),$(MODULE_TARGETS)))
+ifneq ($(CLASHING_RESERVED),)
+  $(error Modul, kok Makefile hedefini eziyor: $(CLASHING_RESERVED). Bu adlar rezervedir: $(RESERVED_TARGETS))
+endif
 
 # --- Ortak hedefler --------------------------------------------------------
 

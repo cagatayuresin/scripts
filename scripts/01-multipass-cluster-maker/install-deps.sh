@@ -90,7 +90,7 @@ fi
 if ((${#MISSING_SNAP[@]} == 0 && ${#MISSING_APT[@]} == 0)); then
   printf '\n'
   log_ok "Tum bagimliliklar hazir, yapilacak bir sey yok."
-  log_dim "Sistemi denetlemek icin: make preflight"
+  log_dim "Sistemi denetlemek icin: make mp-preflight"
   printf '\n'
   exit 0
 fi
@@ -169,5 +169,5 @@ fi
 
 printf '\n'
 log_info "Simdi sistemi denetleyin:"
-log_cmd "make preflight"
+log_cmd "make mp-preflight"
 printf '\n'

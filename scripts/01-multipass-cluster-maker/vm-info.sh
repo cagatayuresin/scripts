@@ -2,8 +2,8 @@
 #
 # vm-info.sh - Kurulu makinelerin durumunu ve baglanti bilgilerini gosterir.
 #
-#   make status    -> --mode status : durum, IP, CPU, bellek ve disk kullanimi
-#   make ssh-info  -> --mode ssh    : kopyalanabilir SSH komutlari
+#   make mp-status    -> --mode status : durum, IP, CPU, bellek ve disk kullanimi
+#   make mp-ssh-info  -> --mode ssh    : kopyalanabilir SSH komutlari
 
 set -Eeuo pipefail
 
@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-require_cmd multipass "Kurulum icin: make install-deps"
+require_cmd multipass "Kurulum icin: make mp-install-deps"
 read -r -a NODE_LIST <<<"$NODES"
 
 vm_exists() {
@@ -94,7 +94,7 @@ done
 if ((${#ACTIVE_NODES[@]} == 0)); then
   banner "Durum" "kurulu makine yok"
   log_info "Bu modulun makinelerinden hicbiri kurulu degil."
-  log_dim "Kurmak icin: make cluster  veya  make singlenode"
+  log_dim "Kurmak icin: make mp-cluster  veya  make mp-singlenode"
   printf '\n'
   exit 0
 fi
@@ -120,8 +120,8 @@ case "$MODE" in
     done
     hr
     printf '\n  %sKomutlar%s\n' "$C_BOLD" "$C_RESET"
-    log_cmd "make ssh-info      # baglanti bilgileri"
-    log_cmd "make clean         # makineleri sil"
+    log_cmd "make mp-ssh-info      # baglanti bilgileri"
+    log_cmd "make mp-clean         # makineleri sil"
     printf '\n'
     ;;
 
