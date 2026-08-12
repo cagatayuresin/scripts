@@ -1,10 +1,15 @@
 // cagatayuresin/scripts - just-the-docs uzerine ince ayarlar
 
-// Terminal ciktilarinin okunakli olmasi icin kod bloklarini biraz siklastir.
-.highlight,
-pre.highlight {
-  font-size: 0.78rem;
-  line-height: 1.45;
+// Kod bloklari ve satir ici kod. Tema varsayilani (~0.75rem) fazla kucuk kaliyor;
+// 0.9rem terminal ciktilarinin 78 karakterlik genisligini hala tasirmadan okunakli.
+.main-content {
+  .highlighter-rouge,
+  .highlight,
+  pre.highlight,
+  code {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
 }
 
 // Rozetlerin (shields.io) baslik altinda hizali ve nefes alan bir sirada durmasi.
