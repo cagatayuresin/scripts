@@ -1,0 +1,66 @@
+#cloud-config
+# Multipass ile olusturulan her dugum bu sablondan uretilir.
+# vm-up.sh su yer tutuculari doldurur:
+#   __NODE_NAME__  -> makine adi (master / worker / datanode / singlenode)
+#   __VM_USER__    -> olusturulacak kullanici adi (varsayilan: cluster)
+#   __VM_PASS__    -> o kullanicinin parolasi (varsayilan: cluster)
+
+hostname: __NODE_NAME__
+# cloud-init her acilista /etc/hosts'u yeniden yazmasin; dugumler arasi kayitlari
+# vm-up.sh yonetilen bir blok halinde ekliyor.
+manage_etc_hosts: false
+timezone: Europe/Istanbul
+
+users:
+  # 'default' MUTLAKA kalmali: multipass'in kendi 'ubuntu' kullanicisi ve SSH
+  # anahtari bununla olusur. Silinirse 'multipass shell/exec' calismaz.
+  - default
+  - name: __VM_USER__
+    gecos: Cluster lab kullanicisi
+    groups: [adm, sudo]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    # Parola ile giris yapilabilmesi icin parola kilidi acik olmali.
+    lock_passwd: false
+
+# Parola ile SSH girisini ac (cloud-init 50-cloud-init.conf dosyasini yazar).
+ssh_pwauth: true
+
+chpasswd:
+  expire: false
+  users:
+    - name: __VM_USER__
+      password: '__VM_PASS__'
+      type: text
+
+write_files:
+  # ssh_pwauth zaten yeterli; bu dosya ayari acikca ve kalici olarak sabitler.
+  # NOT: 'permissions' bilerek yazilmiyor. Multipass user-data'yi yeniden
+  # serilestirirken tirnaklari dusurdugu icin "0644" degeri sekizlik sayi olarak
+  # okunuyor ve cloud-init sema dogrulamasi "420 is not of type 'string'" hatasi
+  # veriyordu. Varsayilan izin (0644) bu dosya icin zaten dogru.
+  - path: /etc/ssh/sshd_config.d/60-cluster-lab.conf
+    content: |
+      # cagatayuresin/scripts - 01-multipass-cluster-maker
+      # Yerel test laboratuvari icin parola ile SSH girisi aciktir.
+      PasswordAuthentication yes
+      PermitRootLogin no
+      UsePAM yes
+
+package_update: true
+package_upgrade: false
+packages:
+  - openssh-server
+  - ca-certificates
+  - curl
+  - vim
+  - net-tools
+
+runcmd:
+  # Hostname'in yerel olarak cozulmesi (sudo'nun "unable to resolve host" uyarisi icin)
+  - ["bash", "-c", "grep -q '^127.0.1.1' /etc/hosts || echo '127.0.1.1 __NODE_NAME__' >> /etc/hosts"]
+  # Ubuntu 24.04'te ssh socket ile aktive olur; her iki isim de denenir.
+  - ["bash", "-c", "systemctl enable --now ssh.socket 2>/dev/null || systemctl enable --now ssh 2>/dev/null || true"]
+  - ["bash", "-c", "systemctl restart ssh 2>/dev/null || systemctl restart sshd 2>/dev/null || true"]
+
+final_message: "cloud-init tamamlandi: __NODE_NAME__ (surum $version, $uptime saniye)"

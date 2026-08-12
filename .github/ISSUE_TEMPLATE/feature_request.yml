@@ -1,0 +1,35 @@
+name: Yeni script / özellik
+description: Yeni bir script modülü veya mevcut bir modüle özellik önerisi
+title: "[öneri] "
+labels: ["öneri"]
+body:
+  - type: textarea
+    id: ihtiyac
+    attributes:
+      label: Hangi işi otomatikleştirmek istiyorsunuz?
+      description: Şu an elle nasıl yapıyorsunuz?
+    validations:
+      required: true
+
+  - type: input
+    id: komut
+    attributes:
+      label: Hayalinizdeki komut
+      placeholder: "make yeni-hedef DEGISKEN=deger"
+    validations:
+      required: true
+
+  - type: textarea
+    id: gereksinimler
+    attributes:
+      label: Gerekli araçlar
+      description: Bu iş hangi programlara ihtiyaç duyar? (docker, ansible, kubectl ...)
+
+  - type: checkboxes
+    id: kapsam
+    attributes:
+      label: Kapsam
+      options:
+        - label: Yeni bir modül olmalı (scripts/NN-...)
+        - label: Mevcut bir modüle eklenmeli
+        - label: Dokümantasyon da gerekiyor

@@ -1,0 +1,11 @@
+# shellcheck yapilandirmasi - cagatayuresin/scripts
+
+# Scriptler bash ile calisir.
+shell=bash
+
+# lib/common.sh gibi calisma aninda cozulen kaynaklari takip et.
+external-sources=true
+
+# SC1091: source edilen dosya statik analizde acilamadiginda uyarir.
+# Yollar calisma aninda REPO_ROOT ile hesaplandigi icin beklenen bir durum.
+disable=SC1091

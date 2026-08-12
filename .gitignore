@@ -1,0 +1,25 @@
+# Uretilen gecici cloud-init dosyalari (parola icerebilir)
+cloud-init-*.yaml
+*.tmp
+
+# Jekyll / GitHub Pages
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/Gemfile.lock
+docs/vendor/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Isletim sistemi
+.DS_Store
+Thumbs.db
+
+# Yerel notlar ve deneme dosyalari
+scratch/
+*.local
+.claude/

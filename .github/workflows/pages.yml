@@ -1,0 +1,51 @@
+name: Dokumantasyon
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Ayni anda tek yayin; devam eden calisma iptal edilmez.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Jekyll derle
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: Pages yapilandirmasi
+        uses: actions/configure-pages@v5
+
+      - name: Jekyll ile derle
+        uses: actions/jekyll-build-pages@v1
+        with:
+          source: ./docs
+          destination: ./_site
+
+      - name: Ciktiyi yukle
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    name: Yayinla
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: GitHub Pages'e dagit
+        id: deployment
+        uses: actions/deploy-pages@v4

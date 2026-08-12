@@ -1,0 +1,33 @@
+// cagatayuresin/scripts - just-the-docs uzerine ince ayarlar
+
+// Terminal ciktilarinin okunakli olmasi icin kod bloklarini biraz siklastir.
+.highlight,
+pre.highlight {
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+// Rozetlerin (shields.io) baslik altinda hizali ve nefes alan bir sirada durmasi.
+h1 + p img,
+h1 + p + p img {
+  margin: 0 0.15rem 0.35rem 0;
+  vertical-align: middle;
+}
+
+// Tablolar sayfa genisligini asmasin, tasarsa kendi icinde kaysin.
+.main-content table {
+  display: block;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+// Terminal ornekleri icin biraz daha belirgin cerceve.
+.main-content pre.highlight {
+  border-radius: 4px;
+}
+
+// Uyari/durum etiketleri ([ TAMAM ], [ UYARI ], [ HATA ]) metin icinde gecerse
+// tek boslukli yaziyla dursun.
+code.status {
+  white-space: nowrap;
+}

@@ -1,0 +1,95 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Shell lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Depoyu al
+        uses: actions/checkout@v4
+
+      - name: shellcheck
+        uses: ludeeus/action-shellcheck@master
+        env:
+          SHELLCHECK_OPTS: --external-sources
+        with:
+          scandir: "."
+          format: gcc
+
+      - name: shfmt kur
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq shfmt
+
+      - name: shfmt (bicimlendirme farki)
+        run: shfmt --diff -i 2 -ci $(find scripts lib -name '*.sh')
+
+      - name: bash -n (sozdizimi)
+        run: |
+          for f in $(find scripts lib -name '*.sh'); do
+            bash -n "$f"
+          done
+
+  permissions-check:
+    name: Calistirilabilir bit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scriptler calistirilabilir mi?
+        run: make check-perms
+
+  make-targets:
+    name: Make hedefleri
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: make help
+        run: make help
+
+      - name: make modules
+        run: make modules
+
+      # Multipass gerektiren hedefler CI'da calistirilmaz; yalnizca scriptlerin
+      # yardim ciktilari ve arguman ayristirmasi denetlenir.
+      - name: Script yardim ciktilari
+        run: |
+          for f in $(find scripts -name '*.sh'); do
+            echo "::group::$f --help"
+            "$f" --help
+            echo "::endgroup::"
+          done
+
+  cloud-init-schema:
+    name: cloud-init sablonu
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: YAML gecerliligi
+        run: |
+          python3 - <<'PY'
+          import sys, yaml, pathlib
+          rc = 0
+          for p in pathlib.Path("scripts").rglob("cloud-init/*.yaml"):
+              raw = p.read_text()
+              # Yer tutucular gercek degerlerle degistirilerek dogrulanir.
+              raw = (raw.replace("__NODE_NAME__", "testnode")
+                        .replace("__VM_USER__", "cluster")
+                        .replace("__VM_PASS__", "cluster"))
+              try:
+                  data = yaml.safe_load(raw)
+                  assert isinstance(data, dict), "kok dugum sozluk olmali"
+                  print(f"OK  {p} -> {', '.join(data)}")
+              except Exception as exc:
+                  print(f"HATA {p}: {exc}")
+                  rc = 1
+          sys.exit(rc)
+          PY
