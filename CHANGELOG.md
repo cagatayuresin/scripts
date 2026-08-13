@@ -7,6 +7,21 @@ sürümler [Semantic Versioning](https://semver.org/lang/tr/) kurallarını izle
 
 ### Eklendi
 
+- **04-ollama-lab** modülü: yerel Ollama için envanter, disk, sağlık ve hız araçları
+  (tüm hedefler salt okunur).
+  - `make llm-list` — yerel/cloud model ayrımı, boyutlar, bellekte tutulan modeller.
+  - `make llm-disk` — manifest katmanlarını benzersizleştirerek **gerçek** disk
+    kullanımını hesaplar. `ollama list` toplamı ile diskteki gerçek boyut arasındaki
+    farkı (paylaşılan katmanlar) ve "bu modeli silersen ne kazanırsın" sorusunun
+    doğru cevabını verir — varyantlar için bu çoğu zaman sıfırdır.
+  - `make llm-smoke` — API, model varlığı, üretim ve embedding uçlarının hızlı testi.
+  - `make llm-bench` — soğuk başlangıç, ilk token gecikmesi (TTFT) ve token/s;
+    yükleme maliyetini görmek için iki ardışık çağrı ölçülür.
+  - `make llm-embed` — embedding vektör boyutu ve gecikme ölçümü (RAG için).
+  - `make llm-rm` / `make llm-purge` — seçili veya tüm yerel modelleri siler; silmeden
+    önce diskte gerçekten boşalacak yeri hesaplar (tek varyant çoğu zaman 0 GB),
+    `DRY=1` ile denenebilir ve onay ister.
+
 - **03-dev-disk** modülü: geliştirme makinesinde biriken çöpü ölçer ve temizler.
   - `make disk-report` — Docker build cache/imaj/volume, journald, APT önbelleği,
     eski snap sürümleri ve çöp kutusu için kategorili kazanç tablosu (salt okunur).
